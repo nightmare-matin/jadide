@@ -1,5 +1,5 @@
 {
-  "name": "ghtun-warzone",
+  "name": "sharp-bridge-e9f8fb",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "."
@@ -12,15 +12,17 @@
       "version": "latest"
     }
   },
-  "postAttachCommand": "sudo -E bash /app/setup.sh",
+  "postAttachCommand": "gh codespace ports visibility 443:public -c $CODESPACE_NAME && bash /usr/local/bin/start.sh",
   "portsAttributes": {
     "443": {
-      "label": "xray-ws",
-      "protocol": "https",
+      "label": "sharp-bridge-e9f8fb",
+      "protocol": "http",
       "onAutoForward": "silent"
     }
   },
-  "forwardPorts": [443],
+  "forwardPorts": [
+    443
+  ],
   "hostRequirements": {
     "cpus": 2
   }
