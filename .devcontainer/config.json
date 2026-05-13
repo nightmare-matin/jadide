@@ -1,46 +1,77 @@
 {
   "log": {
-    "loglevel": "warning"
+    "loglevel": "warning",
+    "access": "none",
+    "error": "/tmp/xray-error.log"
+  },
+  "dns": {
+    "servers": [
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn"
+        ],
+        "queryStrategy": "UseIP"
+      },
+      "8.8.8.8",
+      "localhost"
+    ],
+    "queryStrategy": "UseIPv4"
   },
   "inbounds": [
     {
+      "tag": "vless-in",
       "port": 443,
+      "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
         "clients": [
           {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "level": 0
+            "id": "6e5a26f8-d573-4d03-837d-0ca0d1b435b2",
+            "flow": "",
+            "level": 0,
+            "email": "user@sharp-bridge-e9f8fb"
           }
         ],
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "ws",
+        "network": "xhttp",
         "security": "none",
-        "wsSettings": {
-          "path": "/live-chat",
-          "headers": {}
+        "xhttpSettings": {
+          "mode": "packet-up",
+          "path": "/",
+          "maxUploadSize": 1000000,
+          "maxConcurrentUploads": 10
         }
       },
       "sniffing": {
         "enabled": true,
-        "destOverride": ["http", "tls"]
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "routeOnly": false
       }
     }
   ],
   "outbounds": [
     {
+      "tag": "direct",
       "protocol": "freedom",
       "settings": {
         "domainStrategy": "UseIPv4"
-      },
-      "tag": "direct"
+      }
     },
     {
+      "tag": "block",
       "protocol": "blackhole",
-      "settings": {},
-      "tag": "block"
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
     }
   ],
   "routing": {
@@ -48,7 +79,23 @@
     "rules": [
       {
         "type": "field",
-        "ip": ["geoip:private"],
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
         "outboundTag": "block"
       }
     ]
@@ -62,10 +109,6 @@
         "downlinkOnly": 5,
         "bufferSize": 512
       }
-    },
-    "system": {
-      "statsInboundUplink": false,
-      "statsInboundDownlink": false
     }
   }
 }
